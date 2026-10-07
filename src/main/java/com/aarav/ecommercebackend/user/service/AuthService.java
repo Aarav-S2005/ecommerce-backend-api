@@ -2,6 +2,8 @@ package com.aarav.ecommercebackend.user.service;
 
 import com.aarav.ecommercebackend.security.JwtTokenProvider;
 import com.aarav.ecommercebackend.security.UserPrincipal;
+import com.aarav.ecommercebackend.shared.exception.DuplicateResourceException;
+import com.aarav.ecommercebackend.shared.exception.ResourceNotFoundException;
 import com.aarav.ecommercebackend.user.dto.request.LoginRequestDTO;
 import com.aarav.ecommercebackend.user.dto.request.RegisterRequestDTO;
 import com.aarav.ecommercebackend.user.dto.response.LoginResponseDTO;
@@ -36,7 +38,7 @@ public class AuthService {
 
     public RegisterResponseDTO register(RegisterRequestDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email is already registered: " + request.getEmail());
+            throw new DuplicateResourceException("Email is already registered: " + request.getEmail());
         }
 
         User user = User.builder()

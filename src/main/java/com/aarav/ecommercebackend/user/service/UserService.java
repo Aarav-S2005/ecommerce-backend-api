@@ -10,10 +10,9 @@ import com.aarav.ecommercebackend.user.entity.UserAddress;
 import com.aarav.ecommercebackend.user.repository.UserAddressRepository;
 import com.aarav.ecommercebackend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import com.aarav.ecommercebackend.shared.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -90,7 +89,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public GetAddressResponseDTO getAddress(UUID userId, UUID addressId) {
         UserAddress address = userAddressRepository.findByIdAndUserId(addressId, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + addressId));
 
         return mapToAddressResponse(address);
     }
@@ -98,7 +97,7 @@ public class UserService {
     @Transactional
     public GetAddressResponseDTO updateAddress(UUID userId, UUID addressId, AddAddressDTO request) {
         UserAddress address = userAddressRepository.findByIdAndUserId(addressId, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + addressId));
 
         if (request.getAddressLine1() != null) address.setAddressLine1(request.getAddressLine1());
         if (request.getAddressLine2() != null) address.setAddressLine2(request.getAddressLine2());
@@ -114,14 +113,14 @@ public class UserService {
     @Transactional
     public void deleteAddress(UUID userId, UUID addressId) {
         UserAddress address = userAddressRepository.findByIdAndUserId(addressId, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + addressId));
 
         userAddressRepository.delete(address);
     }
 
     private User findUserById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
     }
 
     private GetAddressResponseDTO mapToAddressResponse(UserAddress address) {
