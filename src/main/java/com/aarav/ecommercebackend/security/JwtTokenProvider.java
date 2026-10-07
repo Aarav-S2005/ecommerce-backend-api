@@ -1,5 +1,6 @@
 package com.aarav.ecommercebackend.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtTokenProvider {
@@ -17,47 +19,44 @@ public class JwtTokenProvider {
     @Value("${app.jwt-secret}")
     private String jwtSecret;
 
-    public String generateJwtToken(Authentication auth){
-        String email = auth.getName();
+    public String generateJwtToken(Authentication auth) {
+        UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
+        UUID userId = principal.getId();
+
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + 900000);
+        Date expiryDate = new Date(now.getTime() + 900000); // 15 mins
 
         return Jwts.builder()
-                .subject(email)
+                .subject(userId.toString()) // UUID as the subject
+                .claim("email", principal.getEmail())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getKey())
                 .compact();
     }
 
-    private Key getKey(){
+    private Key getKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    public String getEmailFromJwt(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith((SecretKey) getKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getSubject();
-        } catch (Exception e) {
-            System.out.println("Cannot get username from token: " + e.getMessage());
-            return null;
-        }
+    public UUID getUserIdFromJwt(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith((SecretKey) getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return UUID.fromString(claims.getSubject());
     }
 
-    public boolean validateToken(String token){
-        try{
+    public boolean validateToken(String token) {
+        try {
             Jwts.parser()
                     .verifyWith((SecretKey) getKey())
                     .build()
-                    .parse(token);
+                    .parseSignedClaims(token);
             return true;
-        } catch (Exception e){
-            System.out.println("Invalid token");
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
             return false;
         }
     }
