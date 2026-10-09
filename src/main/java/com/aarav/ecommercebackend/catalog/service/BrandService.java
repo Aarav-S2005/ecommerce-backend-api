@@ -2,6 +2,7 @@ package com.aarav.ecommercebackend.catalog.service;
 
 import com.aarav.ecommercebackend.catalog.dto.request.BrandRequestDTO;
 import com.aarav.ecommercebackend.catalog.dto.response.BrandResponseDTO;
+import com.aarav.ecommercebackend.catalog.dto.response.GetAllBrandsResponseDTO;
 import com.aarav.ecommercebackend.catalog.entity.Brand;
 import com.aarav.ecommercebackend.catalog.repository.BrandRepository;
 import com.aarav.ecommercebackend.catalog.repository.ProductRepository;
@@ -22,11 +23,13 @@ public class BrandService {
     private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
-    public List<BrandResponseDTO> getAllBrands() {
-        return brandRepository.findByActiveTrue()
+    public GetAllBrandsResponseDTO getAllBrands() {
+        List<BrandResponseDTO> brandList = brandRepository.findByActiveTrue()
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
+
+        return new GetAllBrandsResponseDTO(brandList);
     }
 
     @Transactional(readOnly = true)
@@ -37,7 +40,7 @@ public class BrandService {
     }
 
     @Transactional
-    public BrandResponseDTO addBrand(BrandRequestDTO request) {
+    public void addBrand(BrandRequestDTO request) {
         String trimmedName = request.getName().trim();
         if (brandRepository.existsByNameIgnoreCase(trimmedName)) {
             throw new DuplicateResourceException("Brand already exists with name: " + trimmedName);
@@ -51,12 +54,11 @@ public class BrandService {
                 .active(isActive)
                 .build();
 
-        Brand savedBrand = brandRepository.save(brand);
-        return toResponseDTO(savedBrand);
+        brandRepository.save(brand);
     }
 
     @Transactional
-    public BrandResponseDTO updateBrand(UUID brandId, BrandRequestDTO request) {
+    public void updateBrand(UUID brandId, BrandRequestDTO request) {
         Brand brand = brandRepository.findById(brandId)
                 .orElseThrow(() -> new ResourceNotFoundException("Brand not found with id: " + brandId));
 
@@ -71,8 +73,7 @@ public class BrandService {
             brand.setActive(request.getActive());
         }
 
-        Brand updatedBrand = brandRepository.save(brand);
-        return toResponseDTO(updatedBrand);
+        brandRepository.save(brand);
     }
 
     @Transactional
