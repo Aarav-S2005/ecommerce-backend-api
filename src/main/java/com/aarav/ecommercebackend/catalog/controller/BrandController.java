@@ -14,37 +14,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/catalog")
+@RequestMapping("/catalog/brands")
 @RequiredArgsConstructor
 public class BrandController {
 
     private final BrandService brandService;
 
-    @GetMapping("/brands")
+    @GetMapping("/")
     public ResponseEntity<GetAllBrandsResponseDTO> getAllBrands() {
         return ResponseEntity.ok(brandService.getAllBrands());
     }
 
-    @GetMapping("/brands/{brandId}")
+    @GetMapping("/{brandId}")
     public ResponseEntity<BrandResponseDTO> getBrandById(@PathVariable UUID brandId) {
         return ResponseEntity.ok(brandService.getBrandById(brandId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/brands")
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public void addBrand(@RequestBody @Valid BrandRequestDTO request) {
         brandService.addBrand(request);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/brands/{brandId}")
+    @PutMapping("/{brandId}")
     public void updateBrand(@PathVariable UUID brandId, @RequestBody @Valid BrandRequestDTO request) {
         brandService.updateBrand(brandId, request);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/brands/{brandId}")
+    @DeleteMapping("/{brandId}")
     public ResponseEntity<Void> deleteBrand(@PathVariable UUID brandId) {
         brandService.deleteBrand(brandId);
         return ResponseEntity.noContent().build();

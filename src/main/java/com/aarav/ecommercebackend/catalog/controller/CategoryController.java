@@ -14,37 +14,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/catalog")
+@RequestMapping("/catalog/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/categories")
+    @GetMapping("/")
     public ResponseEntity<GetAllCategoriesResponseDTO> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
-    @GetMapping("/categories/{categoryId}")
+    @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryResponseDTO> getCategory(@PathVariable UUID categoryId) {
         return ResponseEntity.ok(categoryService.getCategoryById(categoryId));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/categories")
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public void addCategory(@RequestBody @Valid CategoryRequestDTO request) {
         categoryService.addCategory(request);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/categories/{categoryId}")
+    @PutMapping("/{categoryId}")
     public void updateCategory(@PathVariable UUID categoryId, @RequestBody @Valid CategoryRequestDTO request) {
         categoryService.updateCategory(categoryId, request);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/categories/{categoryId}")
+    @DeleteMapping("/{categoryId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable UUID categoryId) {
         categoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
