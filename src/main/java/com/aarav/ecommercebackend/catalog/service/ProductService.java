@@ -179,7 +179,7 @@ public class ProductService {
         productRepository.delete(product);
     }
 
-    private ProductResponseDTO toProductResponseDTO(Product product) {
+    public ProductResponseDTO toProductResponseDTO(Product product) {
         List<ProductImageResponseDTO> imageDTOs = product.getImages() != null
                 ? product.getImages().stream()
                 .map(img -> ProductImageResponseDTO.builder()
