@@ -166,37 +166,41 @@ public class OrderService {
             throw new IllegalArgumentException("Order has already been " + currentStatus.name().toLowerCase());
         }
 
+        java.time.OffsetDateTime now = java.time.OffsetDateTime.now();
         boolean isDelivered = currentStatus == OrderStatus.DELIVERED;
         boolean isCashOnDelivery = "CASH_ON_DELIVERY".equalsIgnoreCase(order.getPaymentMethod());
         CancellationType type = request.getType();
 
         if (isDelivered) {
-            if (type == CancellationType.CANCELLATION) {
-                throw new IllegalArgumentException("Delivered orders cannot be cancelled. You can request a return, exchange, or refund.");
-            }
-            if (type == CancellationType.REFUND && isCashOnDelivery) {
-                throw new IllegalArgumentException("Direct refund is not available for Cash on Delivery orders without return inspection.");
+            java.time.OffsetDateTime deliveryTime = order.getUpdatedAt();
+            if (deliveryTime.plusDays(7).isBefore(now)) {
+                throw new IllegalArgumentException("Refund or exchange requests are only eligible within 7 days of delivery.");
             }
 
-            if (type == CancellationType.RETURN) {
-                order.setStatus(OrderStatus.RETURNED);
+            if (type == CancellationType.CANCELLATION) {
+                throw new IllegalArgumentException("Delivered orders cannot be cancelled. You can only request an EXCHANGE or REFUND within 7 days of delivery.");
+            }
+
+            if (type == CancellationType.REFUND) {
+                order.setStatus(OrderStatus.CANCELLED);
                 restoreStock(order);
             } else if (type == CancellationType.EXCHANGE) {
                 order.setStatus(OrderStatus.EXCHANGED);
-            } else if (type == CancellationType.REFUND) {
+            }
+        } else {
+            if (isCashOnDelivery) {
+                if (type != CancellationType.CANCELLATION) {
+                    throw new IllegalArgumentException("For undelivered Cash on Delivery orders, only CANCELLATION is permitted as no payment was collected.");
+                }
+                order.setStatus(OrderStatus.CANCELLED);
+                restoreStock(order);
+            } else {
+                if (type != CancellationType.REFUND && type != CancellationType.CANCELLATION) {
+                    throw new IllegalArgumentException("For undelivered prepaid orders, only CANCELLATION or REFUND is permitted.");
+                }
                 order.setStatus(OrderStatus.CANCELLED);
                 restoreStock(order);
             }
-        } else {
-            if (type == CancellationType.RETURN || type == CancellationType.EXCHANGE) {
-                throw new IllegalArgumentException("Return or exchange is only available once the order is delivered.");
-            }
-            if (type == CancellationType.REFUND && isCashOnDelivery) {
-                throw new IllegalArgumentException("Cannot refund a Cash on Delivery order that has not been delivered or paid.");
-            }
-
-            order.setStatus(OrderStatus.CANCELLED);
-            restoreStock(order);
         }
 
         order.setCancellationType(type.name());

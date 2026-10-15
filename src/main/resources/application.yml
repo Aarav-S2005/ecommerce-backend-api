@@ -1,5 +1,4 @@
 spring:
-
   application:
     name: EcommerceBackend
   datasource:
@@ -24,3 +23,21 @@ spring:
       database: 0
       connect-timeout: 2s
       timeout: 2s
+
+  ai:
+    ollama:
+      chat:
+        model: qwen3:14b-q8_0
+        temperature: 0.1
+        num-ctx: 12288
+        num-predict: 1024
+        top-k: 20
+        top-p: 0.8
+        keep-alive: 10m
+      base-url: http://localhost:11434
+
+app:
+  ai:
+    max-tool-calling: 5
+    max-history-messages: 10
+      

@@ -2,12 +2,14 @@ package com.aarav.ecommercebackend.catalog.repository;
 
 import com.aarav.ecommercebackend.catalog.entity.ProductInteraction;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.net.ContentHandler;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,4 +20,9 @@ public interface ProductInteractionRepository extends JpaRepository<ProductInter
     @EntityGraph(attributePaths = {"product", "product.brand", "product.category"})
     @Query("SELECT pi FROM ProductInteraction pi WHERE pi.user.id = :userId AND pi.liked = true AND pi.product.active = true")
     Page<ProductInteraction> findLikedProductsByUserId(@Param("userId") UUID userId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"product", "product.brand", "product.category"})
+    @Query("SELECT pi FROM ProductInteraction pi WHERE pi.user.id = :userId AND pi.hasSeen = true AND pi.product.active = true ORDER BY pi.lastSeenAt DESC")
+    Page<ProductInteraction> findRecentlyViewedProductsByUserId(@Param("userId") UUID userId, Pageable pageable);
+
 }

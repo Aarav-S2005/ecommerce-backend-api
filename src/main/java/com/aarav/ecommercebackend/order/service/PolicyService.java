@@ -12,59 +12,55 @@ import java.util.Map;
 public class PolicyService {
 
     private static final Map<String, PolicyResponseDTO> POLICIES = Map.of(
-            "return", PolicyResponseDTO.builder()
-                    .policyType("return")
-                    .title("Return Policy")
-                    .description("Delivered items can be returned within 14 days of delivery if they are in their original packaging and unused condition.")
-                    .timeframe("14 days from delivery")
-                    .applicableForCashOnDelivery(true)
-                    .terms(List.of(
-                            "Order status must be DELIVERED to request a return.",
-                            "Item must remain unused, unwashed, and with all original tags attached.",
-                            "Doorstep quality inspection will be conducted during reverse pickup.",
-                            "Cash on Delivery orders require bank details verification during return pickup."
-                    ))
-                    .build(),
-
             "refund", PolicyResponseDTO.builder()
                     .policyType("refund")
                     .title("Refund Policy")
-                    .description("Online payments are automatically refunded to the source payment method upon cancellation or verified return. Cash on Delivery orders are not eligible for direct instant refunds without physical return inspection.")
-                    .timeframe("5-7 business days post-verification")
+                    .description("If your order is not yet delivered, prepaid orders will receive an automatic refund upon cancellation. For delivered orders, refunds can be requested within 7 days of delivery.")
+                    .timeframe("Within 7 days of delivery (or immediate for undelivered cancellations)")
                     .applicableForCashOnDelivery(false)
                     .terms(List.of(
-                            "Credit/Debit cards and UPI refunds are credited within 5-7 business days.",
-                            "Cash on Delivery orders cannot receive instant electronic refunds before delivery.",
-                            "For delivered COD items, refunds are processed via NEFT bank transfer after warehouse verification.",
-                            "Shipping and convenience charges are non-refundable."
+                            "Undelivered prepaid orders are fully refunded immediately upon cancellation.",
+                            "Delivered orders are eligible for refund within 7 days of delivery.",
+                            "COD orders are cancelled without refund if undelivered."
                     ))
                     .build(),
 
             "exchange", PolicyResponseDTO.builder()
                     .policyType("exchange")
                     .title("Exchange Policy")
-                    .description("Delivered items can be exchanged for alternative sizes, colors, or replacement of defective units within 7 days of delivery.")
-                    .timeframe("7 days from delivery")
+                    .description("Delivered items can be exchanged for alternative sizes, colors, or replacement units within 7 days of delivery.")
+                    .timeframe("Within 7 days of delivery")
                     .applicableForCashOnDelivery(true)
                     .terms(List.of(
-                            "Order must be DELIVERED to request an exchange.",
-                            "Exchanges are subject to inventory availability in the warehouse.",
-                            "If replacement stock is unavailable, a full refund will be offered.",
-                            "Reverse pickup is free of charge for damaged or defective items."
+                            "Exchanges are only permitted after order is DELIVERED.",
+                            "Requests must be submitted within 7 days of delivery.",
+                            "Subject to product inventory availability."
                     ))
                     .build(),
 
             "cancellation", PolicyResponseDTO.builder()
                     .policyType("cancellation")
                     .title("Cancellation Policy")
-                    .description("Orders can be cancelled at any time before delivery (while PENDING or CONFIRMED). If paid online, a full refund is initiated automatically. Once delivered, cancellations are closed and return/exchange policies apply.")
+                    .description("Orders can be cancelled anytime before delivery. Cash on Delivery orders are cancelled with zero payment collected. Prepaid orders are cancelled and refunded.")
                     .timeframe("Anytime prior to delivery")
                     .applicableForCashOnDelivery(true)
                     .terms(List.of(
-                            "Allowed freely while the order is in PENDING or CONFIRMED state.",
-                            "Online prepaid orders receive an automatic full refund upon cancellation.",
-                            "Cash on Delivery orders can be cancelled with zero penalty prior to dispatch.",
-                            "Delivered orders cannot be cancelled; please use Return or Exchange instead."
+                            "Allowed freely while order is PENDING, CONFIRMED, or SHIPPED.",
+                            "COD orders are cancelled with zero fees.",
+                            "Prepaid orders trigger an automatic refund.",
+                            "Delivered orders cannot be cancelled (use Refund or Exchange instead)."
+                    ))
+                    .build(),
+
+            "return", PolicyResponseDTO.builder()
+                    .policyType("return")
+                    .title("Return & Refund Policy")
+                    .description("Returns are processed directly as Refunds within 7 days of delivery.")
+                    .timeframe("Within 7 days of delivery")
+                    .applicableForCashOnDelivery(false)
+                    .terms(List.of(
+                            "Returns for money back are handled as Refunds.",
+                            "Request must be made within 7 days of delivery."
                     ))
                     .build()
     );
@@ -77,7 +73,7 @@ public class PolicyService {
         String normalized = policyType.trim().toLowerCase(Locale.ROOT);
         PolicyResponseDTO policy = POLICIES.get(normalized);
         if (policy == null) {
-            throw new ResourceNotFoundException("Policy not found for: " + policyType + ". Available policies: return, refund, exchange, cancellation.");
+            throw new ResourceNotFoundException("Policy not found for: " + policyType + ". Available policies: refund, exchange, cancellation.");
         }
         return policy;
     }
