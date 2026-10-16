@@ -12,6 +12,6 @@ import java.util.UUID;
 public class PageContextDTO {
     private String pageType;
     private UUID productId;
-    private UUID categoryID;
+    private UUID categoryId;
     private String searchQuery;
 }

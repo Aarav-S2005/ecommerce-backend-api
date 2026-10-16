@@ -40,4 +40,8 @@ app:
   ai:
     max-tool-calling: 5
     max-history-messages: 10
+
+server:
+  servlet:
+    context-path: /api/v1
       
