@@ -1,6 +1,5 @@
 package com.aarav.ecommercebackend.ai.orchestrator;
 
-import com.aarav.ecommercebackend.ai.config.AiProperties;
 import com.aarav.ecommercebackend.ai.dto.AgentChatRequestDTO;
 import com.aarav.ecommercebackend.ai.dto.AgentChatResponseDTO;
 import com.aarav.ecommercebackend.ai.dto.AgentResponseStatus;

@@ -37,6 +37,7 @@ spring:
       base-url: http://localhost:11434
 
 app:
+  jwt-secret: ${JWT_SECRET}
   ai:
     max-tool-calling: 5
     max-history-messages: 10
