@@ -24,8 +24,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponseDTO> register(@RequestBody RegisterRequestDTO request) {
-        RegisterResponseDTO response = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        AuthService.RegisterAuthResponse authResponse = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header(HttpHeaders.SET_COOKIE, authResponse.cookie().toString())
+                .body(authResponse.response());
     }
 
     @PostMapping("/login")

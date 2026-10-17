@@ -19,20 +19,22 @@ public class JwtTokenProvider {
     @Value("${app.jwt-secret}")
     private String jwtSecret;
 
-    public String generateJwtToken(Authentication auth) {
-        UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
-        UUID userId = principal.getId();
-
+    public String generateToken(UUID userId, String email) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + 900000); // 15 mins
+        Date expiryDate = new Date(now.getTime() + 900000);
 
         return Jwts.builder()
-                .subject(userId.toString()) // UUID as the subject
-                .claim("email", principal.getEmail())
+                .subject(userId.toString())
+                .claim("email", email)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getKey())
                 .compact();
+    }
+
+    public String generateJwtToken(Authentication auth) {
+        UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
+        return generateToken(principal.getId(), principal.getEmail());
     }
 
     private Key getKey() {

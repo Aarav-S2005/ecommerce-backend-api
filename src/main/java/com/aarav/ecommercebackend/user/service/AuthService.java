@@ -3,7 +3,6 @@ package com.aarav.ecommercebackend.user.service;
 import com.aarav.ecommercebackend.security.JwtTokenProvider;
 import com.aarav.ecommercebackend.security.UserPrincipal;
 import com.aarav.ecommercebackend.shared.exception.DuplicateResourceException;
-import com.aarav.ecommercebackend.shared.exception.ResourceNotFoundException;
 import com.aarav.ecommercebackend.user.dto.request.LoginRequestDTO;
 import com.aarav.ecommercebackend.user.dto.request.RegisterRequestDTO;
 import com.aarav.ecommercebackend.user.dto.response.LoginResponseDTO;
@@ -35,8 +34,9 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public record AuthResponse(LoginResponseDTO response, ResponseCookie cookie) {}
+    public record RegisterAuthResponse(RegisterResponseDTO response, ResponseCookie cookie) {}
 
-    public RegisterResponseDTO register(RegisterRequestDTO request) {
+    public RegisterAuthResponse register(RegisterRequestDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException("Email is already registered: " + request.getEmail());
         }
@@ -52,13 +52,18 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        return new RegisterResponseDTO(
+        String token = jwtTokenProvider.generateToken(savedUser.getId(), savedUser.getEmail());
+        ResponseCookie cookie = createAuthCookie(token);
+
+        RegisterResponseDTO registerResponse = new RegisterResponseDTO(
                 savedUser.getEmail(),
                 savedUser.getPhone(),
                 savedUser.getFirstName(),
                 savedUser.getLastName(),
                 savedUser.getCreatedAt()
         );
+
+        return new RegisterAuthResponse(registerResponse, cookie);
     }
 
     public AuthResponse login(LoginRequestDTO request) {
