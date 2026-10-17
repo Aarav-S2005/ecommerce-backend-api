@@ -24,6 +24,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        String method = request.getMethod();
+
+        if (path.startsWith("/auth/")) {
+            return true;
+        }
+
+        if ("GET".equalsIgnoreCase(method) && path.startsWith("/policies/")) {
+            return true;
+        }
+
+        if ("GET".equalsIgnoreCase(method) && path.startsWith("/catalog/") 
+                && !path.startsWith("/catalog/interaction/")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
     ) throws ServletException, IOException {
 

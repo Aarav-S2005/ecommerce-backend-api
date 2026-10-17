@@ -20,7 +20,7 @@ public class BrandController {
 
     private final BrandService brandService;
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public ResponseEntity<GetAllBrandsResponseDTO> getAllBrands() {
         return ResponseEntity.ok(brandService.getAllBrands());
     }
@@ -31,7 +31,7 @@ public class BrandController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/")
+    @PostMapping({"", "/"})
     @ResponseStatus(HttpStatus.CREATED)
     public void addBrand(@RequestBody @Valid BrandRequestDTO request) {
         brandService.addBrand(request);

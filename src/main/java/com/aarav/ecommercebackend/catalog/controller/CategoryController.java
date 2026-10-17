@@ -20,7 +20,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/")
+    @GetMapping({"", "/"})
     public ResponseEntity<GetAllCategoriesResponseDTO> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
@@ -31,7 +31,7 @@ public class CategoryController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/")
+    @PostMapping({"", "/"})
     @ResponseStatus(HttpStatus.CREATED)
     public void addCategory(@RequestBody @Valid CategoryRequestDTO request) {
         categoryService.addCategory(request);
