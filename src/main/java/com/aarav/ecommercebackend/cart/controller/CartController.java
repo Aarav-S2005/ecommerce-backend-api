@@ -20,7 +20,7 @@ public class CartController {
 
     private final CartService cartService;
 
-    @GetMapping("/")
+    @GetMapping({"/items", ""})
     public ResponseEntity<CartResponseDTO> getCart(
             @AuthenticationPrincipal UserPrincipal principal
     ) {

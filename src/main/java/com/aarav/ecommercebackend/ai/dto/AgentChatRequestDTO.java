@@ -1,6 +1,7 @@
 package com.aarav.ecommercebackend.ai.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.UUID;
@@ -11,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AgentChatRequestDTO {
-    @NotBlank(message = "conversationId required")
+    @NotNull(message = "conversationId required")
     private UUID conversationId;
     @NotBlank(message = "query cannot be blank")
     private String query;
