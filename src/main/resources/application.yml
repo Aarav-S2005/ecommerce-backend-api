@@ -10,7 +10,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -45,4 +45,9 @@ app:
 server:
   servlet:
     context-path: /api/v1
-      
+
+
+logging:
+  level:
+    org.springframework.ai.model.tool: DEBUG
+    org.springframework.ai.chat.client: DEBUG

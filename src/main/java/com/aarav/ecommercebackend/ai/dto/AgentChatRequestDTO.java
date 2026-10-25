@@ -12,7 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AgentChatRequestDTO {
-    @NotNull(message = "conversationId required")
     private UUID conversationId;
     @NotBlank(message = "query cannot be blank")
     private String query;
