@@ -52,7 +52,6 @@ A E-Commerce Backend REST API built with **Spring Boot 4**, **Java 21**, **Postg
 | **Security** | Spring Security, JJWT (Cookie-based Stateless) |
 | **AI Framework** | Spring AI 2.0.0 |
 | **Local LLM Engine** | Ollama (`qwen3:14b-q8_0` with 12K context window) |
-| **API Architecture** | RESTful JSON API (`/api/v1`) |
 
 ---
 
